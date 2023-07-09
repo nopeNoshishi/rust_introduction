@@ -70,6 +70,10 @@ impl Token {
     pub fn space(loc: Location) -> Self {
         Self::new(TokenKind::Space, loc)
     }
+
+    pub fn is_space(&self) -> bool {
+        self.value == TokenKind::Space
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

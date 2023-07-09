@@ -28,7 +28,10 @@ pub fn lexer(input: &str) -> Result<Vec<Token>, LexError> {
             b => return Err(LexError::invalid_char(b as char, Location::new(pos, pos + 1)))
         };
 
-        tokens.push(token);
+        if !token.is_space() {
+            tokens.push(token);
+        }
+
         pos = p;
     }
 
@@ -46,7 +49,6 @@ fn lex_number(input: &[u8], pos: usize) -> Result<(Token, usize), LexError> {
         .unwrap()
         .parse()
         .unwrap();
-
 
     Ok((Token::number(n, Location::new(start, end)), end))
 }
@@ -123,3 +125,29 @@ fn lex_rparen(input: &[u8], start: usize) -> Result<(Token, usize), LexError> {
             |(_, end)| (Token::rparen(Location::new(start, end)), end)
         )
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_lexer() {
+
+        let result = lexer("1 + 2 * 3 - - 10");
+        assert!(result.is_ok());
+
+        let test_tokens = vec![
+            Token::number(1, Location::new(0, 1)),
+            Token::plus(Location::new(2, 3)),
+            Token::number(2, Location::new(4, 5)),
+            Token::asterisk(Location::new(6, 7)),
+            Token::number(3, Location::new(8, 9)),
+            Token::minus(Location::new(10, 11)),
+            Token::minus(Location::new(12, 13)),
+            Token::number(10, Location::new(14, 16)),
+        ];
+
+        assert_eq!(result, Ok(test_tokens))
+    }
+}
+
