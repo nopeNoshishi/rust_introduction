@@ -6,23 +6,36 @@ impl Location {
         Self(start, end)
     }
     pub fn merge(&self, other: &Location) -> Location {
-        use std::cmp::{min, max};
+        use std::cmp::{max, min};
         Location(min(self.0, other.0), max(self.1, other.1))
+    }
+}
+
+impl std::fmt::Display for Location {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}-{}", self.0, self.1)
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Annotation<T> {
-    value: T,
-    loc: Location
+    pub value: T,
+    loc: Location,
 }
 
-impl<T> Annotation<T> {
+impl<T: Clone> Annotation<T> {
     pub fn new(value: T, loc: Location) -> Self {
         Self { value, loc }
     }
-}
 
+    pub fn value(&self) -> T {
+        self.value.clone()
+    }
+
+    pub fn loc(&self) -> Location {
+        self.loc.clone()
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TokenKind {
@@ -33,7 +46,21 @@ pub enum TokenKind {
     Slash,
     LParen,
     RParen,
-    Space
+}
+
+impl std::fmt::Display for TokenKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        use self::TokenKind::*;
+        match self {
+            Number(n) => n.fmt(f),
+            Plus => write!(f, "+"),
+            Minus => write!(f, "-"),
+            Asterisk => write!(f, "*"),
+            Slash => write!(f, "/"),
+            LParen => write!(f, "("),
+            RParen => write!(f, ")"),
+        }
+    }
 }
 
 pub type Token = Annotation<TokenKind>;
@@ -66,20 +93,12 @@ impl Token {
     pub fn rparen(loc: Location) -> Self {
         Self::new(TokenKind::RParen, loc)
     }
-
-    pub fn space(loc: Location) -> Self {
-        Self::new(TokenKind::Space, loc)
-    }
-
-    pub fn is_space(&self) -> bool {
-        self.value == TokenKind::Space
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LexErrorKind {
     InvalidChar(char),
-    Eof
+    Eof,
 }
 
 pub type LexError = Annotation<LexErrorKind>;
@@ -94,13 +113,18 @@ impl LexError {
     }
 }
 
+impl std::fmt::Display for LexError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}-{}", self.0, self.1)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_location_merge() {
-
         let loc1 = Location(1, 6);
         let loc2 = Location(2, 3);
 
@@ -111,11 +135,9 @@ mod tests {
 
     #[test]
     fn test_annotation_new() {
-
         let loc = Location(0, 1);
         let anno = Annotation::<String>::new("+".to_string(), loc);
 
         println!("{:?}", anno);
     }
 }
-
