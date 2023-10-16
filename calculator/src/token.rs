@@ -115,7 +115,7 @@ impl LexError {
 
 impl std::fmt::Display for LexError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}-{}", self.0, self.1)
+        write!(f, "{}-{}", self.loc.0, self.loc.1)
     }
 }
 

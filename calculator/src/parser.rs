@@ -1,9 +1,9 @@
-use std::str::FromStr;
 use std::iter::Peekable;
+use std::str::FromStr;
 
-use crate::token::*;  
-use crate::lexer::lexer;
 use crate::error::Error;
+use crate::lexer::lexer;
+use crate::token::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UniOpKind {

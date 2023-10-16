@@ -1,7 +1,7 @@
+pub mod error;
 pub mod lexer;
 pub mod parser;
 pub mod token;
-pub mod error;
 
 use crate::parser::Ast;
 
@@ -20,9 +20,10 @@ fn main() -> Result<()> {
         };
 
         let ast = match line.parse::<Ast>() {
-            Ok(ast) => ast,
+            Ok(ast) => Some(ast),
             Err(e) => {
-                unimplemented!()
+                eprintln!("Error: {e:?}");
+                None
             }
         };
         println!("{:?}", ast);
